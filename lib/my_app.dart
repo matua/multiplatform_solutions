@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:html/parser.dart' show parse;
@@ -15,6 +18,7 @@ class _MyAppState extends State<MyApp> {
   String siteHeader = '';
   String? corsHeader = '';
   String pageContent = '';
+  String operatingSystem = kIsWeb ? 'web' : Platform.operatingSystem;
 
   void _loadPage(String url) async {
     try {
@@ -121,8 +125,18 @@ class _MyAppState extends State<MyApp> {
                           ),
                         ),
                       ),
-                    )
+                    ),
                   ],
+                ),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    'Application running on $operatingSystem',
+                    style: TextStyle(
+                      fontSize: 21.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ],
             ),
