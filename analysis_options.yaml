@@ -1,0 +1,44 @@
+analyzer:
+  errors:
+    missing_return: error
+    invalid_annotation_target: ignore
+  exclude:
+    - "build/**"
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  language:
+    strict-inference: true
+    strict-raw-types: true
+  strong-mode:
+    implicit-dynamic: true
+
+linter:
+  rules:
+    always_declare_return_types: true
+    always_put_required_named_parameters_first: false
+    avoid_classes_with_only_static_members: false
+    sort_constructors_first: true
+    prefer_single_quotes: true
+    public_member_api_docs: false
+    always_specify_types: true
+    lines_longer_than_80_chars: true
+
+dart_code_metrics:
+  anti-patterns:
+    - long-method
+    - long-parameter-list
+  metrics:
+    cyclomatic-complexity: 20
+    lines-of-executable-code: 50
+    maximum-nesting-level: 5
+    number-of-parameters: 4
+    source-lines-of-code: 50
+  metrics-exclude:
+    - test/**
+  rules:
+    - newline-before-return
+    - no-boolean-literal-compare
+    - no-empty-block
+    - prefer-trailing-comma
+    - prefer-conditional-expressions
+    - no-equal-then-else
