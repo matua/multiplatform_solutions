@@ -18,19 +18,159 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final TextEditingController textEditingController = TextEditingController();
-  String siteHeader = '';
-  String? corsHeader = '';
-  String pageContent = '';
   String operatingSystem = kIsWeb ? 'web' : Platform.operatingSystem;
+  String? corsHeader = '';
   String webViewUrl = '';
-  String title = 'App';
-  final Completer<WebViewController> _controller =
-      Completer<WebViewController>();
+  WebViewController? _controller;
 
-  Future<void> _loadUrl() async {
-    final WebViewController controller = await _controller.future;
-    controller.loadUrl(webViewUrl);
-    Future<String?> title = controller.getTitle();
+  @override
+  Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    return GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: Scaffold(
+              appBar: AppBar(
+                title: const Text('App'),
+              ),
+              body: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      webViewUrl == ''
+                          ? Expanded(
+                              child: Column(),
+                            )
+                          : FutureBuilder<http.Response>(
+                              future: _loadPage(webViewUrl),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<http.Response> snapshot) {
+                                http.Response? response = snapshot.data;
+                                return (snapshot.hasData)
+                                    ? Expanded(
+                                        child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Text(
+                                            response?.statusCode == 400
+                                                ? 'None'
+                                                : parse(response?.body)
+                                                    .getElementsByTagName(
+                                                        'title')[0]
+                                                    .text
+                                                    .trim(),
+                                            style: TextStyle(
+                                                fontSize: 27,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            'CORS Header: ${response?.headers['access-control-allow-origin']}',
+                                            style: TextStyle(
+                                                fontSize: 21,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.red),
+                                          ),
+                                          Expanded(
+                                            child: Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 8.0),
+                                              child: WebView(
+                                                initialUrl: webViewUrl,
+                                                onWebViewCreated:
+                                                    (WebViewController
+                                                        webViewController) {
+                                                  _controller =
+                                                      webViewController;
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ))
+                                    : Expanded(
+                                        child: Center(
+                                            child:
+                                                CircularProgressIndicator()));
+                              }),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: TextField(
+                              onSubmitted: (String url) {
+                                String formattedUrl =
+                                    _formatUrl(textEditingController.text);
+                                _loadUrl(formattedUrl);
+                                setState(() {
+                                  _controller?.loadUrl(formattedUrl);
+                                });
+                              },
+                              keyboardAppearance: Brightness.dark,
+                              controller: textEditingController,
+                              decoration: const InputDecoration(
+                                labelText: 'URL',
+                              ),
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              String formattedUrl =
+                                  _formatUrl(textEditingController.text);
+                              _loadUrl(formattedUrl);
+                              setState(() {
+                                _controller?.loadUrl(formattedUrl);
+                              });
+                            },
+                            child: const SizedBox(
+                              height: 25,
+                              width: 50,
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'LOAD',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 32.0),
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            'Application running on $operatingSystem',
+                            style: TextStyle(
+                                fontSize: 21,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            )));
+  }
+
+  Future<void> _loadUrl(String userUrl) async {
+    setState(() {
+      webViewUrl = userUrl;
+    });
   }
 
   Future<http.Response> _loadPage(String url) async {
@@ -56,128 +196,10 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    SystemChrome.setPreferredOrientations(<DeviceOrientation>[
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
-    return GestureDetector(
-        onTap: () {
-          FocusScope.of(context).requestFocus(FocusNode());
-        },
-        child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            home: Scaffold(
-              appBar: AppBar(
-                title: const Text('App'),
-              ),
-              body: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      FutureBuilder<http.Response>(
-                          future: _loadPage(webViewUrl),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<http.Response> snapshot) {
-                            print('webViewUrl: $webViewUrl');
-                            http.Response? response = snapshot.data;
-                            return (snapshot.hasData || snapshot.data != null)
-                                ? Expanded(
-                                    child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        response?.statusCode == 400
-                                            ? 'None'
-                                            : parse(response?.body)
-                                                .getElementsByTagName(
-                                                    'title')[0]
-                                                .text
-                                                .trim(),
-                                        style: TextStyle(
-                                            fontSize: 27,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Text(
-                                        'CORS Header: ${response?.headers['access-control-allow-origin']}',
-                                        style: TextStyle(
-                                            fontSize: 21,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.red),
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 8.0),
-                                          child: WebView(
-                                            onWebViewCreated:
-                                                _controller.complete,
-                                            onWebResourceError:
-                                                _controller.completeError,
-                                            gestureNavigationEnabled: true,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ))
-                                : Expanded(
-                                    child: Center(
-                                        child: CircularProgressIndicator()));
-                          }),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: TextField(
-                              keyboardAppearance: Brightness.dark,
-                              controller: textEditingController,
-                              decoration: const InputDecoration(
-                                labelText: 'URL',
-                              ),
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                webViewUrl = textEditingController.text;
-                                _loadUrl();
-                              });
-                            },
-                            child: const SizedBox(
-                              height: 25,
-                              width: 50,
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: Text(
-                                  'LOAD',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 32.0),
-                        child: Text(
-                          'Application running on $operatingSystem',
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            )));
+  String _formatUrl(String text) {
+    if (!text.startsWith('https://')) {
+      return 'https://' + text;
+    }
+    return text;
   }
 }
