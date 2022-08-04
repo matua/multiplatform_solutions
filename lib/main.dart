@@ -1,7 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import 'my_app.dart';
 
 void main() {
-  runApp(const MyApp());
+  final Completer<WebViewController> controller =
+      Completer<WebViewController>();
+  runApp(MyApp(
+    controller: controller,
+  ));
 }
