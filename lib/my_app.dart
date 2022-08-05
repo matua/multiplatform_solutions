@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -21,8 +22,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final TextEditingController textEditingController = TextEditingController();
-  String? corsHeader = '';
-  String? title = '';
   int loadingPercentage = 0;
 
   @override
@@ -63,7 +62,9 @@ class _MyAppState extends State<MyApp> {
                                     fontSize: 27, fontWeight: FontWeight.bold),
                               ),
                               Text(
-                                'CORS Header:',
+                                'CORS Header: ${Provider.of<Info>(
+                                  context,
+                                ).corsHeader}',
                                 style: TextStyle(
                                     fontSize: 21,
                                     fontWeight: FontWeight.bold,
@@ -82,7 +83,13 @@ class _MyAppState extends State<MyApp> {
                                               widget.webViewControllerCompleter
                                                   .complete(webViewController);
                                             },
-                                            onPageStarted: (String url) {
+                                            onPageStarted: (String url) async {
+                                              String? corsHeader =
+                                                  await _getCorsHeader(url);
+                                              Provider.of<Info>(context,
+                                                      listen: false)
+                                                  .updateCorsHeader(
+                                                      corsHeader!);
                                               setState(() {
                                                 loadingPercentage = 0;
                                               });
@@ -99,7 +106,7 @@ class _MyAppState extends State<MyApp> {
                                               Provider.of<Info>(
                                                 context,
                                                 listen: false,
-                                              ).updateInfo(title!);
+                                              ).updateTitle(title!);
                                               setState(() {
                                                 loadingPercentage = 100;
                                               });
@@ -181,5 +188,19 @@ class _MyAppState extends State<MyApp> {
       return 'https://' + text;
     }
     return text;
+  }
+
+  Future<String?> _getCorsHeader(String url) async {
+    String? result = 'None';
+    http.Response response = await http.get(
+      Uri.parse(url),
+    );
+    if (response.statusCode == 200) {
+      if (response.headers['access-control-allow-origin'] != null) {
+        result = response.headers['access-control-allow-origin'];
+      }
+    }
+    print(result);
+    return result;
   }
 }

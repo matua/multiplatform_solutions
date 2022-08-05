@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 
 class Info extends ChangeNotifier {
   String? title = 'None';
-  String? headers = 'None';
+  String? corsHeader = 'None';
 
-  void updateInfo(String newTitle) {
+  void updateTitle(String newTitle) {
     title = newTitle;
+    notifyListeners();
+  }
+
+  void updateCorsHeader(String newCorsHeader) {
+    corsHeader = newCorsHeader;
     notifyListeners();
   }
 }
