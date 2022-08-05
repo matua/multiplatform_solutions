@@ -1,14 +1,10 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:provider/provider.dart';
 
+import 'info_change_notifier.dart';
 import 'my_app.dart';
 
 void main() {
-  final Completer<WebViewController> controller =
-      Completer<WebViewController>();
-  runApp(MyApp(
-    controller: controller,
-  ));
+  runApp(ChangeNotifierProvider<Info>(
+      create: (BuildContext context) => Info(), child: MyApp()));
 }
