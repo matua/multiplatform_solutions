@@ -2,12 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
+import 'package:multiplatform_solutions/mobile_webview.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'app_platform.dart';
 import 'info_change_notifier.dart';
+// import 'src/hw_none.dart' // Stub implementation
+//     if (dart.library.io) 'src/mobile_webview.dart' // dart:io implementation
+//     if (dart.library.html) 'src/hw_html.dart';
 
 class MyApp extends StatefulWidget {
   MyApp({
@@ -76,43 +79,12 @@ class _MyAppState extends State<MyApp> {
                                           EdgeInsets.symmetric(vertical: 8.0),
                                       child: Stack(
                                         children: <Widget>[
-                                          WebView(
-                                            initialUrl: 'https://flutter.dev',
-                                            onWebViewCreated: (WebViewController
-                                                webViewController) {
-                                              widget.webViewControllerCompleter
-                                                  .complete(webViewController);
-                                            },
-                                            onPageStarted: (String url) async {
-                                              String? corsHeader =
-                                                  await _getCorsHeader(url);
-                                              Provider.of<Info>(context,
-                                                      listen: false)
-                                                  .updateCorsHeader(
-                                                      corsHeader!);
-                                              setState(() {
-                                                loadingPercentage = 0;
-                                              });
-                                            },
-                                            onProgress: (int progress) {
-                                              setState(() {
-                                                loadingPercentage = progress;
-                                              });
-                                            },
-                                            onPageFinished: (String url) async {
-                                              String? title = await controller
-                                                  .data
-                                                  ?.getTitle();
-                                              Provider.of<Info>(
-                                                context,
-                                                listen: false,
-                                              ).updateTitle(title!);
-                                              setState(() {
-                                                loadingPercentage = 100;
-                                              });
-                                            },
-                                            javascriptMode:
-                                                JavascriptMode.unrestricted,
+                                          CommonWebView(
+                                            loadingPercentage:
+                                                loadingPercentage,
+                                            controller: controller,
+                                            webViewControllerCompleter: widget
+                                                .webViewControllerCompleter,
                                           ),
                                           if (loadingPercentage < 100)
                                             LinearProgressIndicator(
@@ -188,19 +160,5 @@ class _MyAppState extends State<MyApp> {
       return 'https://' + text;
     }
     return text;
-  }
-
-  Future<String?> _getCorsHeader(String url) async {
-    String? result = 'None';
-    http.Response response = await http.get(
-      Uri.parse(url),
-    );
-    if (response.statusCode == 200) {
-      if (response.headers['access-control-allow-origin'] != null) {
-        result = response.headers['access-control-allow-origin'];
-      }
-    }
-    print(result);
-    return result;
   }
 }
