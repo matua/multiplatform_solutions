@@ -33,12 +33,14 @@ class MyApp extends StatelessWidget {
                     (jsonDecode(snapshot.data!) as List<dynamic>);
                 if (constraints.maxWidth < 720) {
                   return NarrowLayout(
+                      key: const PageStorageKey<String>('list'),
                       persons: (listOfPersonsFromJsonFile
                           .map((dynamic person) =>
                               Person.fromJson(person as Map<String, dynamic>))
                           .toList()));
                 } else {
                   return WideLayout(
+                      key: const PageStorageKey<String>('list'),
                       persons: (listOfPersonsFromJsonFile
                           .map((dynamic person) =>
                               Person.fromJson(person as Map<String, dynamic>))

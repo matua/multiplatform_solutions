@@ -16,21 +16,33 @@ class WideLayoutCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 80,
-      height: 80,
+    return Card(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircleAvatar(child: Image.network(imageUrl)),
+          Padding(
+            padding: const EdgeInsets.all(21.0),
+            child: CircleAvatar(
+              radius: MediaQuery.of(context).size.width / 3 * 0.3,
+              backgroundImage: NetworkImage(imageUrl),
+              backgroundColor: Colors.transparent,
+            ),
+          ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 firstName,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 21),
+              ),
+              const SizedBox(
+                width: 5,
               ),
               Text(
                 lastName,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 21),
               ),
             ],
           ),

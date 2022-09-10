@@ -1,4 +1,4 @@
-import 'package:adaptive_ui/views/wide_layouta_card.dart';
+import 'package:adaptive_ui/views/wide_layout_card.dart';
 import 'package:flutter/material.dart';
 
 import '../data/model/person.dart';
@@ -10,10 +10,12 @@ class WideLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(persons);
-    return ListView.builder(
+    return GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+        ),
         itemCount: persons.length,
-        itemBuilder: (context, index) {
+        itemBuilder: (BuildContext context, int index) {
           return WideLayoutCard(
             imageUrl: persons[index].imageUrl,
             firstName: persons[index].firstName,
