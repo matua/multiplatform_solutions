@@ -26,6 +26,7 @@ class _MyAppState extends State<MyApp> {
         Uri.parse(url),
       );
       if (response.statusCode == 200) {
+        print(response.statusCode);
         setState(() {
           pageContent = response.body;
           siteHeader =
@@ -39,6 +40,7 @@ class _MyAppState extends State<MyApp> {
         });
       }
     } catch (e) {
+      print(e);
       setState(() {
         pageContent = 'Page could not be loaded';
       });
