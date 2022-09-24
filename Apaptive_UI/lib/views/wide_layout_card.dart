@@ -35,32 +35,25 @@ class WideLayoutCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
-              padding: const EdgeInsets.all(21.0),
+              padding: const EdgeInsets.all(8.0),
               child: CircleAvatar(
-                radius: MediaQuery.of(context).size.width / 3 * 0.3,
+                radius: MediaQuery.of(context).size.width / 3 * 0.1,
                 backgroundImage: NetworkImage(imageUrl),
                 backgroundColor: Colors.transparent,
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  firstName,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 21),
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  lastName,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 21),
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                '$firstName $lastName',
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 21),
+              ),
             ),
-            Text(email),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(email),
+            ),
           ],
         ),
       ),
