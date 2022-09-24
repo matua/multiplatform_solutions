@@ -19,7 +19,7 @@ class _MyAppState extends State<MyApp> {
   void _loadPage(String url) async {
     try {
       http.Response response = await http.get(
-        Uri.parse(url),
+        Uri.parse(_formatUrl(url)),
       );
       if (response.statusCode == 200) {
         setState(() {
@@ -136,5 +136,12 @@ class _MyAppState extends State<MyApp> {
   void dispose() {
     textEditingController.dispose();
     super.dispose();
+  }
+
+  String _formatUrl(String text) {
+    if (!text.startsWith('https://')) {
+      return 'https://' + text;
+    }
+    return text;
   }
 }
