@@ -4,7 +4,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:multiplatform_solutions/utility.dart';
+import 'package:multiplatform_solutions/views/os_widget.dart';
 import 'package:webviewx/webviewx.dart';
+
+import 'views/load_button_widget.dart';
+import 'views/url_widget.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -63,47 +67,16 @@ class _MyAppState extends State<MyApp> {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(children: <Widget>[
-                    Expanded(
-                      child: TextField(
-                        keyboardAppearance: Brightness.dark,
-                        controller: textEditingController,
-                        decoration: const InputDecoration(
-                          labelText: 'URL',
-                        ),
-                      ),
-                    ),
+                    UrlWidget(textEditingController: textEditingController),
                     ElevatedButton(
                       onPressed: () {
                         webViewController.loadContent(formatUrl(textEditingController.text), SourceType.urlBypass);
                       },
-                      child: const SizedBox(
-                        height: 25,
-                        width: 50,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            'LOAD',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
+                      child: LoadButtonWidget(),
                     ),
                   ]),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 32.0),
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Application running on $operatingSystem',
-                      style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold, color: Colors.black),
-                    ),
-                  ),
-                ),
+                osWidget(operatingSystem: operatingSystem),
               ],
             ),
           ),
