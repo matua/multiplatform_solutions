@@ -21,7 +21,7 @@ linter:
     prefer_single_quotes: true
     public_member_api_docs: false
     always_specify_types: true
-    lines_longer_than_80_chars: true
+    lines_longer_than_80_chars: false
 
 dart_code_metrics:
   anti-patterns:
