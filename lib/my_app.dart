@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:multiplatform_solutions/utility.dart';
 import 'package:webviewx/webviewx.dart';
 
 class MyApp extends StatefulWidget {
@@ -50,9 +51,11 @@ class _MyAppState extends State<MyApp> {
                     padding: EdgeInsets.symmetric(vertical: 8.0),
                     child: Builder(builder: (context) {
                       return WebViewX(
+                        initialContent: 'https://skillbox.ru',
+                        initialSourceType: SourceType.urlBypass,
                         onWebViewCreated: (WebViewXController<dynamic> controller) => webViewController = controller,
-                        height: MediaQuery.of(context).size.height / 2,
-                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height,
+                        width: MediaQuery.of(context).size.width,
                       );
                     }),
                   ),
@@ -71,7 +74,7 @@ class _MyAppState extends State<MyApp> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        webViewController.loadContent(textEditingController.text, SourceType.urlBypass);
+                        webViewController.loadContent(formatUrl(textEditingController.text), SourceType.urlBypass);
                       },
                       child: const SizedBox(
                         height: 25,
