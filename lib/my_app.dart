@@ -22,6 +22,7 @@ class _MyAppState extends State<MyApp> {
   String operatingSystem = kIsWeb ? 'web' : Platform.operatingSystem;
   String webViewUrl = '';
   late WebViewXController<dynamic> webViewController;
+  bool isLoading = true;
 
   @override
   void dispose() {
@@ -54,13 +55,30 @@ class _MyAppState extends State<MyApp> {
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 8.0),
                     child: Builder(builder: (context) {
-                      return WebViewX(
-                        initialContent: 'https://skillbox.ru',
-                        initialSourceType: SourceType.urlBypass,
-                        onWebViewCreated: (WebViewXController<dynamic> controller) => webViewController = controller,
-                        height: MediaQuery.of(context).size.height,
-                        width: MediaQuery.of(context).size.width,
-                      );
+                      return Stack(children: <Widget>[
+                        WebViewX(
+                          initialContent: 'https://skillbox.ru',
+                          initialSourceType: SourceType.urlBypass,
+                          onWebViewCreated: (WebViewXController<dynamic> controller) => webViewController = controller,
+                          height: MediaQuery.of(context).size.height,
+                          width: MediaQuery.of(context).size.width,
+                          onPageFinished: (String src) {
+                            setState(() {
+                              isLoading = false;
+                            });
+                          },
+                          onPageStarted: (String src) {
+                            setState(() {
+                              isLoading = true;
+                            });
+                          },
+                        ),
+                        isLoading
+                            ? LinearProgressIndicator(
+                                minHeight: 10,
+                              )
+                            : Stack(),
+                      ]);
                     }),
                   ),
                 ),
