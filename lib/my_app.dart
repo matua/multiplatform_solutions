@@ -3,6 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:http/http.dart' as http;
 
+import 'utility.dart';
+import 'views/cors_header_widget.dart';
+import 'views/header_widget.dart';
+import 'views/load_url_widget.dart';
+import 'views/page_content_widget.dart';
+import 'views/url_widget.dart';
+
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -15,31 +22,6 @@ class _MyAppState extends State<MyApp> {
   String siteHeader = '';
   String? corsHeader = '';
   String pageContent = '';
-
-  void _loadPage(String url) async {
-    try {
-      http.Response response = await http.get(
-        Uri.parse(_formatUrl(url)),
-      );
-      if (response.statusCode == 200) {
-        setState(() {
-          pageContent = response.body;
-          siteHeader =
-              parse(pageContent).getElementsByTagName('title')[0].text.trim();
-          corsHeader = response.headers['access-control-allow-origin'];
-          corsHeader ??= 'None';
-        });
-      } else {
-        setState(() {
-          pageContent = 'Page could not be loaded';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        pageContent = 'Page could not be loaded';
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,67 +43,22 @@ class _MyAppState extends State<MyApp> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: <Widget>[
-                Expanded(
-                  flex: 1,
-                  child: SizedBox(
-                    child: Text(
-                      siteHeader,
-                      style: const TextStyle(
-                          fontSize: 21, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    'CORS Header: $corsHeader',
-                    style: const TextStyle(
-                        fontSize: 21,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red),
-                  ),
-                ),
-                Expanded(
-                    flex: 5,
-                    child: SingleChildScrollView(
-                      child: Text(pageContent),
-                    )),
+                HeaderWidget(siteHeader: siteHeader),
+                CorsHeaderWidget(corsHeader: corsHeader),
+                PageContentWidget(pageContent: pageContent),
                 const Divider(color: Colors.grey),
                 Row(
                   children: <Widget>[
-                    Expanded(
-                      flex: 6,
-                      child: TextField(
-                        keyboardAppearance: Brightness.dark,
-                        controller: textEditingController,
-                        decoration: const InputDecoration(
-                          labelText: 'URL',
-                        ),
-                      ),
-                    ),
+                    UrlWidget(textEditingController: textEditingController),
                     Expanded(
                       flex: 2,
                       child: ElevatedButton(
                         onPressed: () {
                           _loadPage(textEditingController.text);
                         },
-                        child: const SizedBox(
-                          height: 25,
-                          width: 50,
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              'LOAD',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
+                        child: LoadUrlWidget(),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ],
@@ -138,10 +75,27 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
-  String _formatUrl(String text) {
-    if (!text.startsWith('https://')) {
-      return 'https://' + text;
+  void _loadPage(String url) async {
+    try {
+      http.Response response = await http.get(
+        Uri.parse(formatUrl(url)),
+      );
+      if (response.statusCode == 200) {
+        setState(() {
+          pageContent = response.body;
+          siteHeader = parse(pageContent).getElementsByTagName('title')[0].text.trim();
+          corsHeader = response.headers['access-control-allow-origin'];
+          corsHeader ??= 'None';
+        });
+      } else {
+        setState(() {
+          pageContent = 'Page could not be loaded';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        pageContent = 'Page could not be loaded';
+      });
     }
-    return text;
   }
 }
