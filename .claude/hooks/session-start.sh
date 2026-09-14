@@ -1,11 +1,12 @@
 #!/bin/bash
-# SessionStart hook: install the GitLab CLI (glab) and authenticate it to the
-# company self-managed GitLab, so `glab` is ready in every fresh remote session.
+# SessionStart hook: install the GitLab CLI (glab) so it is ready in every
+# fresh remote session (the container is ephemeral and loses it otherwise).
 #
-# The token is NEVER stored in this repo. It is read from the GITLAB_TOKEN
-# environment variable, which must be set in the Claude Code environment
-# secrets (Environments -> Secrets on claude.ai/code). If GITLAB_TOKEN is not
-# set, the hook exits quietly without failing the session.
+# By design the token is NOT stored anywhere (not in this repo, not in the
+# cloud environment variables, which are unmasked). Authentication is done
+# manually per session: paste the token in chat and have the assistant run
+# `glab auth login`. If a GITLAB_TOKEN happens to be present in the
+# environment, the hook will use it, but that is optional and not expected.
 set -euo pipefail
 
 GLAB_HOST="git.pwypp.com"
@@ -38,6 +39,6 @@ if [ -n "${GITLAB_TOKEN:-}" ]; then
   glab config set git_protocol https --host "$GLAB_HOST" --global >/dev/null 2>&1 || true
   echo "session-start: glab authenticated to $GLAB_HOST" >&2
 else
-  echo "session-start: GITLAB_TOKEN not set; installed glab but skipped login." >&2
-  echo "session-start: add GITLAB_TOKEN in your environment secrets to auto-login." >&2
+  echo "session-start: glab installed. No token stored by design;" >&2
+  echo "session-start: authenticate manually with 'glab auth login --hostname $GLAB_HOST'." >&2
 fi
